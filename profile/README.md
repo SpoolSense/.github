@@ -14,7 +14,7 @@
 
 SpoolSense is an open-source ecosystem for automatic NFC-based filament tracking. Tap an NFC tag on your spool and your printer knows exactly what's loaded — material, color, weight, and more — without typing a thing.
 
-Built for Voron, Klipper, and multi-toolhead setups. Works with Spoolman and Home Assistant out of the box.
+Built for Voron/Klipper printers with single, multi-toolhead, or AFC (Box Turtle) setups. Works with Spoolman and Home Assistant out of the box.
 
 ```
 Tap NFC tag on spool
