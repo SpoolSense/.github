@@ -65,6 +65,20 @@ LED shows filament color → Mainsail / Fluidd shows active spool
 
 ---
 
+## Help Wanted: CAD / Enclosure Design
+
+No printable cases exist yet for the current hardware. If you design for 3D printing, contributions are very welcome.
+
+**Designs needed:**
+
+- **Standalone scanner case (ESP32-WROOM-32 + AITRIP PN5180)** — wall or desk mount with NFC placement area on top
+- **Standalone scanner case (ESP32-S3-Zero + AITRIP PN5180)** — same, smaller footprint
+- **BoxTurtle AFC lane mount** — positions the PN5180 antenna correctly for tags on loaded spools
+
+[Open an issue](https://github.com/SpoolSense/spoolsense_scanner/issues) in the scanner repo with photos and files.
+
+---
+
 ## Community
 
 - **Issues & bugs** — open an issue in the relevant repo
