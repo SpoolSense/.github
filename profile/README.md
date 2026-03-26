@@ -12,21 +12,25 @@
 
 ## What is SpoolSense?
 
-SpoolSense is an open-source ecosystem for automatic NFC-based filament tracking. Tap an NFC tag on your spool and your printer knows exactly what's loaded — material, color, weight, and more — without typing a thing.
+SpoolSense is an open-source ecosystem for automatic NFC-based filament tracking. Tap an NFC tag on your spool and your printer knows exactly what's loaded — material, color, weight, temperatures, and more — without typing a thing.
 
-Built for Voron/Klipper printers with single, multi-toolhead, or AFC (BoxTurtle) setups. Works with Spoolman and Home Assistant out of the box.
+Built for Klipper printers — single toolhead, multi-tool (klipper-toolchanger), or AFC (BoxTurtle/NightOwl). Works with Spoolman and Home Assistant out of the box. Slicer integration publishes spool data so Orca Slicer auto-populates tool colors, materials, and temps.
+
+Designed for multi-platform — the publisher architecture means adding support for new printer platforms (Prusa, Bambu, Elegoo) requires one new file.
 
 ```
 Tap NFC tag on spool
         ↓
-ESP32 scanner reads tag (OpenPrintTag / TigerTag / OpenTag3D / NTAG215)
+ESP32 scanner reads tag (OpenPrintTag / TigerTag / OpenTag3D / NTAG)
         ↓
 Publishes decoded spool data via MQTT
         ↓
-SpoolSense middleware updates Spoolman + Klipper
+SpoolSense middleware activates spool in Klipper + syncs Spoolman
         ↓
-LED shows filament color → Mainsail / Fluidd shows active spool
+LED shows filament color → Slicer auto-populates tool info
 ```
+
+**Shared scanner modes** — one scanner for all AFC lanes (`afc_stage`) or all toolheads (`toolhead_stage`). Scan a spool, load a lane or pick up a tool — data auto-assigns. No dedicated scanner per lane/tool required.
 
 ---
 
@@ -34,8 +38,8 @@ LED shows filament color → Mainsail / Fluidd shows active spool
 
 | Repo | What it is |
 |------|-----------|
-| [spoolsense_scanner](https://github.com/SpoolSense/spoolsense_scanner) | ESP32 firmware — reads and writes NFC tags, built-in web UI for tag reading/writing/config, publishes to MQTT and Home Assistant |
-| [spoolsense_middleware](https://github.com/SpoolSense/spoolsense_middleware) | Python middleware — runs on a Pi, bridges the scanner to Spoolman, Klipper, AFC/BoxTurtle, and Home Assistant |
+| [spoolsense_scanner](https://github.com/SpoolSense/spoolsense_scanner) | ESP32 firmware — reads and writes NFC tags, built-in web UI for tag reading/writing/config/NFC+ registration, publishes to MQTT and Home Assistant |
+| [spoolsense_middleware](https://github.com/SpoolSense/spoolsense_middleware) | Python middleware — runs on a Pi, bridges the scanner to Spoolman, Klipper, AFC/BoxTurtle, klipper-toolchanger, and slicers via extensible publisher architecture |
 | [spoolsense-installer](https://github.com/SpoolSense/spoolsense-installer) | Interactive CLI installer — flashes firmware, configures middleware, sets up Spoolman extra fields in one command |
 
 ---
@@ -48,8 +52,8 @@ LED shows filament color → Mainsail / Fluidd shows active spool
    curl -sL https://raw.githubusercontent.com/SpoolSense/spoolsense-installer/main/install.sh -o /tmp/install.sh && bash /tmp/install.sh
    ```
 3. **Get your Scanner ID** — Open `http://spoolsense.local` and copy the Device ID from the landing page.
-4. **Write some tags** — Use the built-in web UI at `spoolsense.local` to write filament data to NFC tags.
-5. **Scan and print** — Tap a tagged spool on the scanner. Spoolman, Klipper, and your front end update automatically.
+4. **Write some tags** — Use the built-in web UI at `spoolsense.local` to write filament data to NFC tags. Or use NFC+ to register plain NTAG tags in Spoolman without writing any data to the tag.
+5. **Scan and print** — Tap a tagged spool on the scanner. Spoolman, Klipper, your slicer, and your front end update automatically.
 
 ---
 
@@ -57,11 +61,11 @@ LED shows filament color → Mainsail / Fluidd shows active spool
 
 | Format | Read | Write | Notes |
 |--------|------|-------|-------|
-| OpenPrintTag (ISO15693) | ✅ | ✅ | Full CBOR payload — material, color, weight, remaining tracking |
+| OpenPrintTag (ISO15693) | ✅ | ✅ | Full CBOR payload — material, color, weight, temperatures, remaining tracking |
 | TigerTag (ISO14443A) | ✅ | ✅ | Binary format — material, brand, color, weight, temperatures |
 | OpenTag3D (ISO14443A) | ✅ | ✅ | NDEF binary — material, color, weight, density, extended fields |
 | Bambu Lab (MIFARE Classic) | ✅ | — | UID detection only (encrypted, no data access) |
-| NTAG215 (ISO14443A) | ✅ | — | UID-only, Spoolman lookup via middleware |
+| Plain NFC (NTAG215, etc.) | ✅ | — | UID-only — register in Spoolman via NFC+ web page, no data on tag |
 
 ---
 
